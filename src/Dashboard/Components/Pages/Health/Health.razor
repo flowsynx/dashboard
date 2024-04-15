@@ -1,0 +1,51 @@
+﻿@page "/health"
+@using FlowSynx.Client
+@using FlowSynx.Client.Responses.Health
+@using Microsoft.AspNetCore.Components
+
+@inject IFlowSynxClient FlowSynxClient
+@inject ISnackbar SnackBar
+
+<PageTitle>Health</PageTitle>
+
+<HeaderTitle Title="FlowSynx HealthCheck" Description="Checking the health of FlowSynx system and its components" />
+
+<MudTable ServerData="LoadData" Dense="true" Hover="true" Bordered="false" Striped="false" @ref="_table" LoadingProgressColor="Color.Primary">
+    <HeaderContent>
+        <MudTh>Component</MudTh>
+        <MudTh>Description</MudTh>
+        <MudTh>Status</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Component"><b>@context.Component</b></MudTd>
+        <MudTd DataLabel="Description">@context.Description</MudTd>
+        <MudTd DataLabel="Status">@context.Status</MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private readonly CancellationTokenSource _cts = new();
+    private MudTable<IndividualHealthCheckResponse>? _table;
+
+    private async Task<TableData<IndividualHealthCheckResponse>> LoadData(TableState state)
+    {
+        var response = new List<IndividualHealthCheckResponse>();
+        var result = await FlowSynxClient.Health(_cts.Token);
+        response.AddRange(result.HealthChecks);
+
+        return new TableData<IndividualHealthCheckResponse>
+        {
+            Items = response,
+            TotalItems = response.Count()
+        };
+    }
+}

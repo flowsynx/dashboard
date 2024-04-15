@@ -1,0 +1,182 @@
+﻿@page "/config"
+@using FlowSynx.Client
+@using FlowSynx.Client.Requests.Config
+@using FlowSynx.Client.Responses.Config
+@using Microsoft.AspNetCore.Components
+
+@inject IFlowSynxClient FlowSynxClient
+@inject ISnackbar SnackBar
+@inject IDialogService DialogService
+
+<PageTitle>Configuration</PageTitle>
+
+<HeaderTitle Title="Configuration list" Description="List of configuration defined in FlowSynx system" />
+
+<MudExpansionPanels>
+    <MudExpansionPanel Text="Query">
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="Request.Type" Label="Type" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Enter the Type of pluging in config (e.g., FlowSynx.Storage/Azure.Files)"></MudTextField>
+            </MudItem>
+            <MudItem xs="12" md="12">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" Color="Color.Primary" Size="Size.Small" OnClick="OnSearch">Process</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudExpansionPanel>
+</MudExpansionPanels>
+<br />
+<MudTable ServerData="LoadData" Dense="true" Hover="true" Bordered="false" Striped="false" @ref="_table" LoadingProgressColor="Color.Primary">
+    <ToolBarContent>
+        <MudButton DisableElevation Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Surface" Size="Size.Small" OnClick="InvokeAddDialog">Add new config</MudButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh Style="text-align:right">Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name"><b>@context.Name</b></MudTd>
+        <MudTd DataLabel="Type">@context.Type</MudTd>
+        <MudTd DataLabel="Actions" Style="text-align: right">
+            <MudIconButton Icon="@Icons.Material.Filled.Search" Size="Size.Small" OnClick="@(() => InvokeDetailsDialog(@context.Name))"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Small" OnClick="@(() => InvokeDeleteDialog(@context.Name))"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+<style>
+    .blur-dialog-background {
+        backdrop-filter: blur(4px);
+    }
+</style>
+
+@code {
+    private readonly CancellationTokenSource _cts = new();
+    private ConfigListRequest? Request { get; set; } = new ConfigListRequest();
+    private MudTable<ConfigListResponse>? _table;
+
+    private async Task<TableData<ConfigListResponse>> LoadData(TableState state)
+    {
+        IEnumerable<ConfigListResponse> response = new List<ConfigListResponse>();
+        if (Request != null)
+        {
+            var result = await FlowSynxClient.ConfigList(Request, _cts.Token);
+            if (result.Succeeded)
+            {
+                response = result.Data;
+            }
+            else
+            {
+                foreach (var message in result.Messages)
+                {
+                    SnackBar.Add(message, Severity.Error);
+                }
+            }
+        }
+
+        var configListResponses = response.ToList();
+        return new TableData<ConfigListResponse>
+            {
+                Items = configListResponses,
+                TotalItems = configListResponses.Count()
+            };
+    }
+
+    private async void OnSearch()
+    {
+        if (_table != null)
+            await _table.ReloadServerData();
+    }
+
+    private async Task InvokeAddDialog()
+    {
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            DisableBackdropClick = true,
+            CloseOnEscapeKey = true,
+            ClassBackground = "blur-dialog-background"
+        };
+        var parameters = new DialogParameters { };
+
+        var dialog = await DialogService.ShowAsync<ConfigAddDialog>("Add new config", parameters, options);
+        var dialogResult = await dialog.Result;
+        if (!dialogResult.Canceled)
+            OnSearch();
+    }
+
+    private async Task InvokeDetailsDialog(string name)
+    {
+        var result = await FlowSynxClient.ConfigDetails(new ConfigDetailsRequest { Name = name }, _cts.Token);
+
+        if (!result.Succeeded)
+        {
+            foreach (var message in result.Messages)
+            {
+                SnackBar.Add(message, Severity.Error);
+            }
+            return;
+        }
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            DisableBackdropClick = true,
+            CloseOnEscapeKey = true,
+            ClassBackground = "blur-dialog-background"
+        };
+        var parameters = new DialogParameters {
+            {
+                nameof(ConfigDetailsResponse), result.Data
+            }
+        };
+
+        await DialogService.ShowAsync<ConfigDetailsDialog>("Config details", parameters, options);
+    }
+
+    private async Task InvokeDeleteDialog(string name)
+    {
+        var result = await FlowSynxClient.ConfigDetails(new ConfigDetailsRequest { Name = name }, _cts.Token);
+
+        if (!result.Succeeded)
+        {
+            foreach (var message in result.Messages)
+            {
+                SnackBar.Add(message, Severity.Error);
+            }
+            return;
+        }
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            DisableBackdropClick = true,
+            CloseOnEscapeKey = true,
+            ClassBackground = "blur-dialog-background"
+        };
+        var parameters = new DialogParameters {
+            {
+                nameof(ConfigDetailsResponse), result.Data
+            }
+        };
+
+        var dialog = await DialogService.ShowAsync<ConfigDeleteDialog>("Delete Config Confirmation", parameters, options);
+        var dialogResult = await dialog.Result;
+        if (!dialogResult.Canceled)
+            OnSearch();
+    }
+}

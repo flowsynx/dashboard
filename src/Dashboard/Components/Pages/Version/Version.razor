@@ -1,0 +1,67 @@
+﻿@page "/version"
+@using FlowSynx.Client
+@using FlowSynx.Client.Responses.Version
+@using Microsoft.AspNetCore.Components
+
+@inject IFlowSynxClient FlowSynxClient
+@inject ISnackbar SnackBar
+
+<PageTitle>Version</PageTitle>
+
+<HeaderTitle Title="FlowSynx Version" Description="Information about FlowSynx version and hosting machine" />
+
+<MudTable ServerData="LoadData" Dense="true" Hover="true" Bordered="false" Striped="false" @ref="_table" LoadingProgressColor="Color.Primary">
+    <HeaderContent>
+        <MudTh>FlowSynx Version</MudTh>
+        <MudTh>OS Version</MudTh>
+        <MudTh>OS Type</MudTh>
+        <MudTh>OS Architecture</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="FlowSynx"><b>@context.FlowSynx</b></MudTd>
+        <MudTd DataLabel="OSVersion">@context.OSVersion</MudTd>
+        <MudTd DataLabel="OSType">@context.OSType</MudTd>
+        <MudTd DataLabel="OSArchitecture">@context.OSArchitecture</MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+</MudTable>
+
+@code {
+    private readonly CancellationTokenSource _cts = new();
+    private MudTable<VersionResponse>? _table;
+
+    private async Task<TableData<VersionResponse>> LoadData(TableState state)
+    {
+        var response = new List<VersionResponse>();
+
+        var result = await FlowSynxClient.Version(_cts.Token);
+        if (result.Succeeded)
+        {
+            response.Add(result.Data);
+        }
+        else
+        {
+            foreach (var message in result.Messages)
+            {
+                SnackBar.Add(message, Severity.Error);
+            }
+        }
+
+        return new TableData<VersionResponse>
+            {
+                Items = response,
+                TotalItems = response.Count()
+            };
+    }
+
+    private async void OnSearch()
+    {
+        if (_table != null)
+            await _table.ReloadServerData();
+    }
+}

@@ -1,0 +1,32 @@
+﻿@using FlowSynx.Client.Responses.Config
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Search" Class="mr-3 mb-n1" /> View Details
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12" md="12">
+                <MudTextField ReadOnly="true" For="@(() => ConfigDetailsResponse.Id)" @bind-Value="ConfigDetailsResponse.Id" Label="Id" Variant="Variant.Text" Margin="Margin.Dense" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField ReadOnly="true" For="@(() => ConfigDetailsResponse.Name)" @bind-Value="ConfigDetailsResponse.Name" Label="Name" Variant="Variant.Text" Margin="Margin.Dense" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField ReadOnly="true" For="@(() => ConfigDetailsResponse.Type)" @bind-Value="ConfigDetailsResponse.Type" Label="Type" Variant="Variant.Text" Margin="Margin.Dense" />
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton DisableElevation Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Close" Color="Color.Default" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public required ConfigDetailsResponse ConfigDetailsResponse { get; set; }
+
+    void Cancel() => MudDialog.Cancel();
+}

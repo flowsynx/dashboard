@@ -1,0 +1,53 @@
+﻿@using FlowSynx.Client.Responses.Config
+@using FlowSynx.Client
+@using FlowSynx.Client.Requests.Config
+
+@inject IFlowSynxClient FlowSynxClient
+@inject ISnackbar SnackBar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Delete" Class="mr-3 mb-n1" /> Delete Config Confirmation
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12" md="12">
+                <MudTextField ReadOnly="true" For="@(() => ConfigDetailsResponse.Name)" @bind-Value="ConfigDetailsResponse.Name" Label="Name" Variant="Variant.Text" Margin="Margin.Dense" />
+            </MudItem>
+            <MudItem xs="12" md="12">
+                <MudTextField ReadOnly="true" For="@(() => ConfigDetailsResponse.Type)" @bind-Value="ConfigDetailsResponse.Type" Label="Type" Variant="Variant.Text" Margin="Margin.Dense" />
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton DisableElevation Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Close" Color="Color.Default" OnClick="Cancel">Cancel</MudButton>
+        <MudButton DisableElevation Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="Delete">Confirm</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public required ConfigDetailsResponse ConfigDetailsResponse { get; set; }
+
+    void Close() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task Delete()
+    {
+        var result = await FlowSynxClient.DeleteConfig(new DeleteConfigRequest{ Name = ConfigDetailsResponse.Name });
+        if (!result.Succeeded)
+        {
+            foreach (var message in result.Messages)
+            {
+                SnackBar.Add(message, Severity.Error);
+            }
+        }
+        else
+        {
+            SnackBar.Add("Config deleted successfully!", Severity.Success);
+            Close();
+        }
+    }
+}

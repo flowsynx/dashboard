@@ -1,0 +1,86 @@
+﻿@page "/plugins"
+@using FlowSynx.Client
+@using FlowSynx.Client.Requests.Plugins
+@using FlowSynx.Client.Responses.Plugins
+@using Microsoft.AspNetCore.Components
+
+@inject IFlowSynxClient FlowSynxClient
+@inject ISnackbar SnackBar
+
+<PageTitle>Plugins</PageTitle>
+
+<HeaderTitle Title="Plugins list" Description="List of plugins supported by FlowSynx system" />
+
+<MudExpansionPanels>
+    <MudExpansionPanel Text="Query">
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="Request.Namespace" Label="Type" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Enter the namespace of pluging (e.g., Storage)"></MudTextField>
+            </MudItem>
+            <MudItem xs="12" md="12">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" Color="Color.Primary" Size="Size.Small" OnClick="OnSearch">Process</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudExpansionPanel>
+</MudExpansionPanels>
+<br />
+<MudTable ServerData="LoadData" Dense="true" Hover="true" Bordered="false" Striped="false" @ref="_table" LoadingProgressColor="Color.Primary">
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh>Description</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name"><b>@context.Type</b></MudTd>
+        <MudTd DataLabel="Type">@context.Description</MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private readonly CancellationTokenSource _cts = new();
+    private PluginsListRequest? Request { get; set; } = new PluginsListRequest();
+    private MudTable<PluginsListResponse>? _table;
+
+    private async Task<TableData<PluginsListResponse>> LoadData(TableState state)
+    {
+        IEnumerable<PluginsListResponse> response = new List<PluginsListResponse>();
+        if (Request != null)
+        {
+            var result = await FlowSynxClient.PluginsList(Request, _cts.Token);
+            if (result.Succeeded)
+            {
+                response = result.Data;
+            }
+            else
+            {
+                foreach (var message in result.Messages)
+                {
+                    SnackBar.Add(message, Severity.Error);
+                }
+            }
+        }
+
+        var configListResponses = response.ToList();
+        return new TableData<PluginsListResponse>
+            {
+                Items = configListResponses,
+                TotalItems = configListResponses.Count()
+            };
+    }
+
+    private async void OnSearch()
+    {
+        if (_table != null)
+            await _table.ReloadServerData();
+    }
+}

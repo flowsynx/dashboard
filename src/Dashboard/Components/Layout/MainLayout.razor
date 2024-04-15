@@ -1,0 +1,52 @@
+﻿@using Dashboard.Settings
+@inherits LayoutComponentBase
+@inject IPreferenceManager PreferenceManager
+
+<MudThemeProvider Theme="_currentTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="25">
+        <MudText Typo="Typo.h6">FlowSynx Dashboard</MudText>
+        <MudToolBar DisableGutters="true">
+            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="DrawerToggle" Class="ml-3" />
+        </MudToolBar>
+        <MudSpacer />
+        <MudTooltip Text="Toggle Dark Mode">
+            <MudIconButton Icon="@Icons.Material.Filled.Brightness4" Color="Color.Inherit" OnClick="DarkMode"/>
+        </MudTooltip>
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="25" ClipMode="DrawerClipMode.Always">
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.False" Class="mt-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    MudTheme? _currentTheme;
+    bool _drawerOpen = true;
+
+    private async void DrawerToggle()
+    {
+        var drawerState = await PreferenceManager.ChangeDrawerStateAsync();
+        _drawerOpen = drawerState;
+    }
+
+    private async void DarkMode()
+    {
+        var isDarkMode = await PreferenceManager.ToggleDarkModeAsync();
+        _currentTheme = isDarkMode ? Theme.DefaultTheme : Theme.DarkTheme;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        _currentTheme = await PreferenceManager.GetCurrentThemeAsync();
+        _drawerOpen = await PreferenceManager.IsDrawerOpenAsync();
+        StateHasChanged();
+    }
+}
