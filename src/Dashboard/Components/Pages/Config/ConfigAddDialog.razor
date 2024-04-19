@@ -2,7 +2,6 @@
 @using FlowSynx.Client.Requests.Config
 @using FlowSynx.Client.Requests.Plugins
 @using FlowSynx.Client.Responses.Plugins
-@using System.Xml.Linq
 
 @inject IFlowSynxClient FlowSynxClient
 @inject ISnackbar SnackBar
@@ -19,7 +18,32 @@
                 <MudTextField For="@(() => AddConfigRequest.Name)" @bind-Value="AddConfigRequest.Name" Label="Name" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Enter the name of config item" />
             </MudItem>
             <MudItem xs="12" md="12">
-                <MudAutocomplete T="string" Label="Plugin Type" For="@(() => AddConfigRequest.Type)" @bind-Value="AddConfigRequest.Type" ResetValueOnEmptyText="true" SearchFunc="@SearchPluginTypes" Variant="Variant.Text" Margin="Margin.Dense" ToStringFunc="@(i => _pluginTypes.FirstOrDefault(b => b.Type == i)?.Type ?? string.Empty)" OffsetY="true" HelperText="Enter the type of config item" />
+                <MudAutocomplete T="string" Label="Plugin Type" For="@(() => AddConfigRequest.Type)" @bind-Value="AddConfigRequest.Type" ResetValueOnEmptyText="true" SearchFunc="@SearchPluginTypes" Variant="Variant.Text" Margin="Margin.Dense" ToStringFunc="@(i => _pluginTypes.FirstOrDefault(b => b.Type == i)?.Type ?? string.Empty)" HelperText="Enter the type of config item" />
+            </MudItem>
+
+            <MudItem xs="12" md="12">
+                <MudText Typo="Typo.h6" Color="Color.Primary">Specifications</MudText>
+                <MudTable Items="_specifications" Hover="true" Breakpoint="Breakpoint.Sm" Dense="true">
+                    <ToolBarContent>
+                        <MudButton DisableElevation Variant="Variant.Filled" Color="Color.Default" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Surface" Size="Size.Small" OnClick="Add">Add new</MudButton>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh>Key</MudTh>
+                        <MudTh>Value</MudTh>
+                        <MudTh>Action</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>
+                            <MudTextField For="@(() => context.Key)" @bind-Value="context.Key" Variant="Variant.Text" Margin="Margin.Dense"/>
+                        </MudTd>
+                        <MudTd>
+                            <MudTextField For="@(() => context.Value)" @bind-Value="context.Value" Variant="Variant.Text" Margin="Margin.Dense"/>
+                        </MudTd>
+                        <MudTd>
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Small" OnClick="@(() => Delete(context.Id))"></MudIconButton>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
             </MudItem>
         </MudGrid>
     </DialogContent>
@@ -34,15 +58,29 @@
 
     [Parameter]
     public required AddConfigRequest AddConfigRequest { get; set; } = new AddConfigRequest
-    {
-        Name = "",
-        Type = ""
-    };
+        {
+            Name = "",
+            Type = ""
+        };
+
+    private List<TempKeyValue> _specifications = new List<TempKeyValue>();
 
     private IEnumerable<PluginsListResponse> _pluginTypes = new List<PluginsListResponse>();
 
     void Close() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
+
+    void Add()
+    {
+        _specifications.Add(new TempKeyValue(){Id = Guid.NewGuid()});
+    }
+
+    void Delete(Guid id)
+    {
+        var item = _specifications.FirstOrDefault(x => x.Id == id);
+        if (item != null)
+            _specifications.Remove(item);
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,7 +98,7 @@
             }
             Cancel();
         }
-        
+
         _pluginTypes = result.Data;
     }
 
@@ -76,6 +114,22 @@
 
     private async Task Save()
     {
+        if (_specifications.Any())
+        {
+            Dictionary<string, string?> objDict = new Dictionary<string, string?>();
+            foreach (var item in _specifications)
+            {
+                if (!objDict.ContainsKey(item.Key))
+                    objDict.Add(item.Key, item.Value);
+            }
+            
+            AddConfigRequest.Specifications = objDict;
+        }
+        else
+        {
+            AddConfigRequest.Specifications = null;
+        }
+
         var result = await FlowSynxClient.AddConfig(AddConfigRequest);
         if (!result.Succeeded)
         {
@@ -89,5 +143,12 @@
             SnackBar.Add("Config added successfully!", Severity.Success);
             Close();
         }
+    }
+    
+    private class TempKeyValue
+    {
+        public Guid Id { get; set; }
+        public string Key { get; set; } = string.Empty;
+        public string? Value { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿@using FlowSynx.Client.Responses.Config
+@using Newtonsoft.Json
 
 <MudDialog>
     <TitleContent>
@@ -9,14 +10,27 @@
     <DialogContent>
         <MudGrid>
             <MudItem xs="12" md="12">
-                <MudTextField ReadOnly="true" For="@(() => ConfigDetailsResponse.Id)" @bind-Value="ConfigDetailsResponse.Id" Label="Id" Variant="Variant.Text" Margin="Margin.Dense" />
-            </MudItem>
-            <MudItem xs="12" md="6">
                 <MudTextField ReadOnly="true" For="@(() => ConfigDetailsResponse.Name)" @bind-Value="ConfigDetailsResponse.Name" Label="Name" Variant="Variant.Text" Margin="Margin.Dense" />
             </MudItem>
-            <MudItem xs="12" md="6">
+            <MudItem xs="12" md="12">
                 <MudTextField ReadOnly="true" For="@(() => ConfigDetailsResponse.Type)" @bind-Value="ConfigDetailsResponse.Type" Label="Type" Variant="Variant.Text" Margin="Margin.Dense" />
             </MudItem>
+            @if (ConfigDetailsResponse.Specifications != null)
+            {
+                <MudItem xs="12" md="12">
+                    <MudText Typo="Typo.h6" Color="Color.Primary">Specifications</MudText>
+                    <MudTable Items="ConfigDetailsResponse.Specifications" Hover="true" Breakpoint="Breakpoint.Sm" Dense="true">
+                        <HeaderContent>
+                            <MudTh>Key</MudTh>
+                            <MudTh>Value</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd><b>@context.Key</b></MudTd>
+                            <MudTd>@context.Value</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudItem>
+            }
         </MudGrid>
     </DialogContent>
     <DialogActions>
