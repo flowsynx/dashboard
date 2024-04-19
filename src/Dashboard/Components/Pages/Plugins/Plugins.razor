@@ -7,7 +7,7 @@
 @inject IFlowSynxClient FlowSynxClient
 @inject ISnackbar SnackBar
 
-<PageTitle>Plugins</PageTitle>
+<PageTitle>FlowSynx Plugins</PageTitle>
 
 <HeaderTitle Title="Plugins list" Description="List of plugins supported by FlowSynx system" />
 
@@ -15,7 +15,7 @@
     <MudExpansionPanel Text="Query">
         <MudGrid>
             <MudItem xs="12" md="6">
-                <MudTextField @bind-Value="Request.Namespace" Label="Type" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Enter the namespace of pluging (e.g., Storage)"></MudTextField>
+                <MudTextField @bind-Value="Request.Namespace" Label="Namespace" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Enter the namespace of pluging (e.g., Storage)"></MudTextField>
             </MudItem>
             <MudItem xs="12" md="12">
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" Color="Color.Primary" Size="Size.Small" OnClick="OnSearch">Process</MudButton>
