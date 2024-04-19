@@ -1,45 +1,68 @@
 using Blazored.LocalStorage;
 using Dashboard.Components;
+using Dashboard.Extensions;
 using Dashboard.Preferences;
 using FlowSynx.Client;
+using FlowSynx.Environment;
 using MudBlazor.Services;
 
 namespace Dashboard;
 
 public static class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        WebApplication? app = null;
 
-        // Add services to the container.
-        builder.Services.AddRazorComponents()
-            .AddInteractiveServerComponents();
-
-        builder.Services
-            .AddMudServices()
-            .AddBlazoredLocalStorage()
-            .AddScoped<IPreferenceManager, PreferenceManager>()
-            .AddScoped<IFlowSynxClient, FlowSynxClient>();
-
-        var app = builder.Build();
-
-        // Configure the HTTP request pipeline.
-        if (!app.Environment.IsDevelopment())
+        try
         {
-            app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts();
+            var builder = WebApplication.CreateBuilder();
+
+            builder.WebHost.ConfigHttpServer(EnvironmentVariables.FlowSynxDashboardHttpPort);
+
+            var configuration = new ConfigurationBuilder()
+                .AddCommandLine(args)
+                .Build();
+
+            builder.Services.AddRazorComponents()
+                .AddInteractiveServerComponents();
+
+            var cliArguments = configuration.BindCliArguments();
+
+            builder.Services
+                .AddMudServices()
+                .AddBlazoredLocalStorage()
+                .AddLoggingService()
+                .AddScoped<IPreferenceManager, PreferenceManager>()
+                .AddScoped<IFlowSynxClient, FlowSynxClient>()
+                .AddSingleton(new FlowSynxClientConnection { BaseAddress = cliArguments.BaseUrl });
+
+            app = builder.Build();
+
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseExceptionHandler("/Error");
+            }
+
+            app.UseStaticFiles();
+            app.UseAntiforgery();
+
+            app.MapRazorComponents<App>()
+                .AddInteractiveServerRenderMode();
+
+            await app.RunAsync();
         }
-
-        app.UseHttpsRedirection();
-
-        app.UseStaticFiles();
-        app.UseAntiforgery();
-
-        app.MapRazorComponents<App>()
-            .AddInteractiveServerRenderMode();
-
-        app.Run();
+        catch (Exception ex)
+        {
+            if (app != null)
+            {
+                var logger = app.Services.GetRequiredService<ILogger>();
+                logger.Log(LogLevel.Error, ex.Message);
+            }
+            else
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
     }
 }

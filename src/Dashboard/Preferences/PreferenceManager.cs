@@ -38,7 +38,7 @@ public class PreferenceManager : IPreferenceManager
         var preference = await GetPreference();
         preference.IsDrawerOpen = !preference.IsDrawerOpen;
         await SetPreference(preference);
-        return !preference.IsDrawerOpen;
+        return preference.IsDrawerOpen;
     }
 
     private async Task<ClientPreference> GetPreference()

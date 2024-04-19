@@ -8,7 +8,7 @@ public static class Theme
     {
         Default = new Default()
         {
-            FontFamily = new[] { "Tahoma", "Montserrat", "Helvetica", "Arial", "sans-serif" },
+            FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
             FontSize = ".875rem",
             FontWeight = 400,
             LineHeight = 1.43,
@@ -16,7 +16,7 @@ public static class Theme
         },
         H1 = new H1()
         {
-            FontFamily = new[] { "Tahoma", "Montserrat", "Helvetica", "Arial", "sans-serif" },
+            FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
             FontSize = "6rem",
             FontWeight = 300,
             LineHeight = 1.167,
@@ -24,7 +24,7 @@ public static class Theme
         },
         H2 = new H2()
         {
-            FontFamily = new[] { "Tahoma", "Montserrat", "Helvetica", "Arial", "sans-serif" },
+            FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
             FontSize = "3.75rem",
             FontWeight = 300,
             LineHeight = 1.2,
@@ -32,7 +32,7 @@ public static class Theme
         },
         H3 = new H3()
         {
-            FontFamily = new[] { "Tahoma", "Montserrat", "Helvetica", "Arial", "sans-serif" },
+            FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
             FontSize = "3rem",
             FontWeight = 400,
             LineHeight = 1.167,
@@ -40,7 +40,7 @@ public static class Theme
         },
         H4 = new H4()
         {
-            FontFamily = new[] { "Tahoma", "Montserrat", "Helvetica", "Arial", "sans-serif" },
+            FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
             FontSize = "2.125rem",
             FontWeight = 400,
             LineHeight = 1.235,
@@ -48,7 +48,7 @@ public static class Theme
         },
         H5 = new H5()
         {
-            FontFamily = new[] { "Tahoma", "Montserrat", "Helvetica", "Arial", "sans-serif" },
+            FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
             FontSize = "1.5rem",
             FontWeight = 400,
             LineHeight = 1.334,
@@ -56,7 +56,7 @@ public static class Theme
         },
         H6 = new H6()
         {
-            FontFamily = new[] { "Tahoma", "Montserrat", "Helvetica", "Arial", "sans-serif" },
+            FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
             FontSize = "1.25rem",
             FontWeight = 400,
             LineHeight = 1.6,
@@ -64,7 +64,7 @@ public static class Theme
         },
         Button = new Button()
         {
-            FontFamily = new[] { "Tahoma", "Montserrat", "Helvetica", "Arial", "sans-serif" },
+            FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
             FontSize = ".875rem",
             FontWeight = 500,
             LineHeight = 1.75,
@@ -72,7 +72,7 @@ public static class Theme
         },
         Body1 = new Body1()
         {
-            FontFamily = new[] { "Tahoma", "Montserrat", "Helvetica", "Arial", "sans-serif" },
+            FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
             FontSize = "1rem",
             FontWeight = 400,
             LineHeight = 1.5,
@@ -80,7 +80,7 @@ public static class Theme
         },
         Body2 = new Body2()
         {
-            FontFamily = new[] { "Tahoma", "Montserrat", "Helvetica", "Arial", "sans-serif" },
+            FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
             FontSize = ".875rem",
             FontWeight = 400,
             LineHeight = 1.43,
@@ -88,7 +88,7 @@ public static class Theme
         },
         Caption = new Caption()
         {
-            FontFamily = new[] { "Tahoma", "Montserrat", "Helvetica", "Arial", "sans-serif" },
+            FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
             FontSize = ".75rem",
             FontWeight = 400,
             LineHeight = 1.66,
@@ -96,7 +96,7 @@ public static class Theme
         },
         Subtitle2 = new Subtitle2()
         {
-            FontFamily = new[] { "Tahoma", "Montserrat", "Helvetica", "Arial", "sans-serif" },
+            FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
             FontSize = ".875rem",
             FontWeight = 500,
             LineHeight = 1.57,
@@ -113,12 +113,11 @@ public static class Theme
     {
         Palette = new PaletteLight()
         {
-            //Primary = "#5A2FAB",
-            //AppbarBackground = "#5A2FAB",
+            Primary = "#0aa3ec",
+            AppbarBackground = "#0aa3ec",
             Background = Colors.Grey.Lighten5,
-            DrawerBackground = "#FFF",
-            DrawerText = "rgba(0,0,0, 0.7)",
-            Success = "#007E33"
+            DrawerBackground = "#FFFFFF",
+            DrawerText = "rgba(0,0,0, 0.7)"
         },
         Typography = DefaultTypography,
         LayoutProperties = DefaultLayoutProperties
@@ -128,8 +127,7 @@ public static class Theme
     {
         Palette = new PaletteDark()
         {
-            Primary = "#1E88E5",
-            Success = "#007E33",
+            Primary = "#0aa3ec",
             Black = "#27272f",
             Background = "#32333d",
             BackgroundGrey = "#27272f",
