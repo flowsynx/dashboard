@@ -2,6 +2,29 @@
 
 <PageTitle>Home</PageTitle>
 
-<MudMenu Label="Click here to test">
-    <MudMenuItem>It works</MudMenuItem>
-</MudMenu>
+<MudContainer MaxWidth="MaxWidth.False">
+    <MudText Typo="Typo.h3" Color="Color.Primary" Align="Align.Center">FlowSynx Dashboard</MudText>
+    <br/><br/>
+    <MudGrid>
+        <MudItem xs="12" sm="3">
+            <MudButton Href="/config" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Settings" IconSize="Size.Large" FullWidth="true" Style="height: 100px;">
+                Configuration Manager
+            </MudButton>
+        </MudItem>
+        <MudItem xs="12" sm="3">
+            <MudButton Href="/plugins" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.GridView" IconSize="Size.Large" FullWidth="true" Style="height: 100px;">
+                Plugins Manager
+            </MudButton>
+        </MudItem>
+        <MudItem xs="12" sm="3">
+            <MudButton Href="/health" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.HealthAndSafety" IconSize="Size.Large" FullWidth="true" Style="height: 100px;">
+                HealthCheck
+            </MudButton>
+        </MudItem>
+        <MudItem xs="12" sm="3">
+            <MudButton Href="/version" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Check" IconSize="Size.Large" FullWidth="true" Style="height: 100px;">
+                Version
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
