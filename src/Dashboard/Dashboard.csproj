@@ -11,7 +11,7 @@
 		<Company>FlowSynx</Company>
 		<Description>General purpose dashboard for FlowSynx</Description>
 		<Authors>FlowSynx</Authors>
-		<PackageProjectUrl>http://flowsynx.io</PackageProjectUrl>
+		<PackageProjectUrl>https://flowsynx.io</PackageProjectUrl>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
