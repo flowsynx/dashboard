@@ -35,7 +35,7 @@ public static class Program
                 .AddLoggingService()
                 .AddScoped<IPreferenceManager, PreferenceManager>()
                 .AddScoped<IFlowSynxClient, FlowSynxClient>()
-                .AddSingleton(new FlowSynxClientConnection { BaseAddress = cliArguments.BaseUrl });
+                .AddSingleton(new FlowSynxClientConnection { BaseAddress = cliArguments.Address });
 
             app = builder.Build();
 
