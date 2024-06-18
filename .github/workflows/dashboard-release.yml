@@ -1,4 +1,4 @@
-name: Publish the project for different OS and create release and tag
+name: dashboard
 
 on:      
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
 
 env:
   DOCKER_USER_NAME: ${{ github.repository_owner }}
-  DOCKER_IMAGE_NAME: ${{ github.repository }} 
+  DOCKER_IMAGE_NAME: ${{ github.event.repository.name }} 
 
 jobs:
   build:
@@ -85,9 +85,6 @@ jobs:
           fi
           cd "${{github.workspace}}"
 
-          # Delete output directory
-          # rm -r "${{ env.ARCHIVE_OUTDIR }}/$release_name"
-
     - name: Upload bineries
       uses: actions/upload-artifact@v2
       with:
@@ -101,7 +98,7 @@ jobs:
     env:
       ARTIFACT_DIR: ./release
     steps:  
-    #Push NuGet package to GitHub packages
+    #Release and add artifacts to the release
     - name: Download nuget package artifact
       uses: actions/download-artifact@v1.0.0
       with:
@@ -136,15 +133,15 @@ jobs:
         include:
           - os: ubuntu-latest
             version: alpine3.18
-            file: ./docker/Dockerfile.linux
+            file: docker/Dockerfile.Linux
             tag: ${{ needs.compute.outputs.docker_user_name }}/${{ needs.compute.outputs.docker_image_name }}:${{ inputs.rel_version }}-linux-amd64
           - os: windows-2019
             version: nanoserver-1809
-            file: ./docker/Dockerfile.windows
+            file: docker/Dockerfile.Windows
             tag: ${{ needs.compute.outputs.docker_user_name }}/${{ needs.compute.outputs.docker_image_name }}:${{ inputs.rel_version }}-windows-1809-amd64
           - os: windows-2022
             version: nanoserver-ltsc2022
-            file: ./docker/Dockerfile.windows
+            file: docker/Dockerfile.Windows
             tag: ${{ needs.compute.outputs.docker_user_name }}/${{ needs.compute.outputs.docker_image_name }}:${{ inputs.rel_version }}-windows-ltsc2022-amd64
     runs-on: ${{ matrix.os }}
     needs: [compute, build, release]
@@ -159,7 +156,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Docker Build
       run: |
-        docker build -f ${{ matrix.file }} --build-arg OS_VERSION=${{ matrix.version }} NUGET_ORGANIZATION=${{ github.repository_owner }} NUGET_USERNAME=${{ secrets.GH_USERNAME }} NUGET_PASSWORD=${{ secrets.GH_TOKEN }} APP_VERSION=${{ inputs.rel_version }} -t ${{ matrix.tag }} .       
+        docker build -f ${{ matrix.file }} --build-arg OS_VERSION=${{ matrix.version }} --build-arg NUGET_ORGANIZATION=${{ github.repository_owner }} --build-arg NUGET_USERNAME=${{ secrets.GH_USERNAME }} --build-arg NUGET_PASSWORD=${{ secrets.GH_TOKEN }} --build-arg APP_VERSION=${{ inputs.rel_version }} -t ${{ matrix.tag }} .       
     - name: Docker Push
       run: |
         docker push ${{ matrix.tag }}
