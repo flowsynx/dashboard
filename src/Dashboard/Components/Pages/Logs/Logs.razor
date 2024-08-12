@@ -1,0 +1,115 @@
+﻿@page "/logs"
+@using FlowSynx.Client
+@using FlowSynx.Client.Requests.Logs
+@using FlowSynx.Client.Responses.Logs
+@using Microsoft.AspNetCore.Components
+
+@inject IFlowSynxClient FlowSynxClient
+@inject ISnackbar SnackBar
+
+<PageTitle>FlowSynx Plugins</PageTitle>
+
+<HeaderTitle Title="Plugins list" Description="List of plugins supported by FlowSynx system" />
+
+<MudExpansionPanels>
+    <MudExpansionPanel Text="Query">
+        <MudGrid>
+            <MudItem xs="12" md="4">
+                <MudTextField @bind-Value="Request.Include" Label="Include" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Include configs matching pattern"></MudTextField>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudTextField @bind-Value="Request.Exclude" Label="Exclude" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Exclude configs matching pattern"></MudTextField>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudCheckBox @bind-Value="Request.CaseSensitive" Label="Ignore/Apply case sensitive in filters"></MudCheckBox>
+            </MudItem>
+            <MudFlexBreak />
+            <MudItem xs="12" md="4">
+                <MudTextField @bind-Value="Request.MinAge" Label="Minimum age" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Filter configs older than this in s or suffix ms|s|m|h|d|w|M|y"></MudTextField>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudTextField @bind-Value="Request.MaxAge" Label="Maximum age" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Filter configs younger than this in s or suffix ms|s|m|h|d|w|M|y"></MudTextField>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudTextField @bind-Value="Request.Level" Label="Level" Variant="Variant.Text" Margin="Margin.Dense" HelperText="The log verbosity to controls the amount of detail emitted for each event that is logged. Valid values are Dbug|Info|Warn|Fail|Crit"></MudTextField>
+            </MudItem>
+            <MudFlexBreak />
+            <MudItem xs="12" md="4">
+                <MudTextField @bind-Value="Request.Sorting" Label="Sorting" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Sorting configs based on field name and ascending and descending. Like Property ASC, Property2 DESC"></MudTextField>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudTextField @bind-Value="Request.MaxResults" Label="Maximum results" Variant="Variant.Text" Margin="Margin.Dense" HelperText="The maximum number of results to return"></MudTextField>
+            </MudItem>
+            <MudFlexBreak />
+            <MudItem xs="12" md="12">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" Color="Color.Primary" Size="Size.Small" OnClick="OnSearch">Process</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudExpansionPanel>
+</MudExpansionPanels>
+<br />
+<MudTable ServerData="LoadData" Dense="true" Hover="true" Bordered="false" Striped="false" @ref="_table" LoadingProgressColor="Color.Primary">
+    <HeaderContent>
+        <MudTh>TimeStamp</MudTh>
+        <MudTh>Level</MudTh>
+        <MudTh>Machine</MudTh>
+        <MudTh>UserName</MudTh>
+        <MudTh>Message</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.TimeStamp</MudTd>
+        <MudTd DataLabel="Name"><b>@context.Level</b></MudTd>
+        <MudTd DataLabel="Type">@context.Machine</MudTd>
+        <MudTd DataLabel="Type">@context.UserName</MudTd>
+        <MudTd DataLabel="Type">@context.Message</MudTd>
+
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private readonly CancellationTokenSource _cts = new();
+    private LogsListRequest? Request { get; set; } = new LogsListRequest();
+    private MudTable<LogsListResponse>? _table;
+
+    private async Task<TableData<LogsListResponse>> LoadData(TableState state)
+    {
+        IEnumerable<LogsListResponse> response = new List<LogsListResponse>();
+        if (Request != null)
+        {
+            var result = await FlowSynxClient.LogsList(Request, _cts.Token);
+            if (result.Succeeded)
+            {
+                response = result.Data;
+            }
+            else
+            {
+                foreach (var message in result.Messages)
+                {
+                    SnackBar.Add(message, Severity.Error);
+                }
+            }
+        }
+
+        var configListResponses = response.ToList();
+        return new TableData<LogsListResponse>
+            {
+                Items = configListResponses,
+                TotalItems = configListResponses.Count()
+            };
+    }
+
+    private async void OnSearch()
+    {
+        if (_table != null)
+            await _table.ReloadServerData();
+    }
+}
