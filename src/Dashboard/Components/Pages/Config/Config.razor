@@ -15,9 +15,30 @@
 <MudExpansionPanels>
     <MudExpansionPanel Text="Query">
         <MudGrid>
-            <MudItem xs="12" md="6">
-                <MudTextField @bind-Value="Request.Type" Label="Type" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Enter the Type of pluging in config (e.g., FlowSynx.Storage/Azure.Files)"></MudTextField>
+            <MudItem xs="12" md="4">
+                <MudTextField @bind-Value="Request.Include" Label="Include" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Include configs matching pattern"></MudTextField>
             </MudItem>
+            <MudItem xs="12" md="4">
+                <MudTextField @bind-Value="Request.Exclude" Label="Exclude" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Exclude configs matching pattern"></MudTextField>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudCheckBox @bind-Value="Request.CaseSensitive" Label="Ignore/Apply case sensitive in filters"></MudCheckBox>
+            </MudItem>
+            <MudFlexBreak />
+            <MudItem xs="12" md="4">
+                <MudTextField @bind-Value="Request.MinAge" Label="Minimum age" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Filter configs older than this in s or suffix ms|s|m|h|d|w|M|y"></MudTextField>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudTextField @bind-Value="Request.MaxAge" Label="Maximum age" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Filter configs younger than this in s or suffix ms|s|m|h|d|w|M|y"></MudTextField>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudTextField @bind-Value="Request.Sorting" Label="Sorting" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Sorting configs based on field name and ascending and descending. Like Property ASC, Property2 DESC"></MudTextField>
+            </MudItem>
+            <MudFlexBreak />
+            <MudItem xs="12" md="4">
+                <MudTextField @bind-Value="Request.MaxResults" Label="Maximum results" Variant="Variant.Text" Margin="Margin.Dense" HelperText="The maximum number of results to return"></MudTextField>
+            </MudItem>
+            <MudFlexBreak />
             <MudItem xs="12" md="12">
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" Color="Color.Primary" Size="Size.Small" OnClick="OnSearch">Process</MudButton>
             </MudItem>
@@ -33,12 +54,14 @@
         <MudTh>Id</MudTh>
         <MudTh>Name</MudTh>
         <MudTh>Type</MudTh>
+        <MudTh>Modified Time</MudTh>
         <MudTh Style="text-align:right">Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Name"><b>@context.Name</b></MudTd>
         <MudTd DataLabel="Type">@context.Type</MudTd>
+        <MudTd DataLabel="ModifiedTime">@context.ModifiedTime</MudTd>
         <MudTd DataLabel="Actions" Style="text-align: right">
             <MudIconButton Icon="@Icons.Material.Filled.Search" Size="Size.Small" OnClick="@(() => InvokeDetailsDialog(@context.Name))"></MudIconButton>
             <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Small" OnClick="@(() => InvokeDeleteDialog(@context.Name))"></MudIconButton>

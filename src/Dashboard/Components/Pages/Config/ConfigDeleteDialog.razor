@@ -36,7 +36,7 @@
 
     private async Task Delete()
     {
-        var result = await FlowSynxClient.DeleteConfig(new DeleteConfigRequest{ Name = ConfigDetailsResponse.Name });
+        var result = await FlowSynxClient.DeleteConfig(new DeleteConfigRequest{ Include = ConfigDetailsResponse.Name });
         if (!result.Succeeded)
         {
             foreach (var message in result.Messages)
