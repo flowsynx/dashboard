@@ -90,16 +90,20 @@
     private async Task LoadPluginTypes()
     {
         var result = await FlowSynxClient.PluginsList(new PluginsListRequest());
-        if (!result.Succeeded)
+        if (result.StatusCode != 200)
+            SnackBar.Add("It seems there is an error occurred during processing the request.", Severity.Error);
+
+        var payload = result.Payload;
+        if (!payload.Succeeded)
         {
-            foreach (var message in result.Messages)
+            foreach (var message in payload.Messages)
             {
                 SnackBar.Add(message, Severity.Error);
             }
             Cancel();
         }
 
-        _pluginTypes = result.Data;
+        _pluginTypes = payload.Data;
     }
 
     private async Task<IEnumerable<string>> SearchPluginTypes(string value)
@@ -131,9 +135,13 @@
         }
 
         var result = await FlowSynxClient.AddConfig(AddConfigRequest);
-        if (!result.Succeeded)
+        if (result.StatusCode != 200)
+            SnackBar.Add("It seems there is an error occurred during processing the request.", Severity.Error);
+
+        var payload = result.Payload;
+        if (!payload.Succeeded)
         {
-            foreach (var message in result.Messages)
+            foreach (var message in payload.Messages)
             {
                 SnackBar.Add(message, Severity.Error);
             }

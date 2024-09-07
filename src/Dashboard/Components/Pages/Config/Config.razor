@@ -95,13 +95,17 @@
         if (Request != null)
         {
             var result = await FlowSynxClient.ConfigList(Request, _cts.Token);
-            if (result.Succeeded)
+            if (result.StatusCode != 200)
+                SnackBar.Add("It seems there is an error occurred during processing the request.", Severity.Error);
+
+            var payload = result.Payload;
+            if (payload.Succeeded)
             {
-                response = result.Data;
+                response = payload.Data;
             }
             else
             {
-                foreach (var message in result.Messages)
+                foreach (var message in payload.Messages)
                 {
                     SnackBar.Add(message, Severity.Error);
                 }
@@ -143,10 +147,13 @@
     private async Task InvokeDetailsDialog(string name)
     {
         var result = await FlowSynxClient.ConfigDetails(new ConfigDetailsRequest { Name = name }, _cts.Token);
+        if (result.StatusCode != 200)
+            SnackBar.Add("It seems there is an error occurred during processing the request.", Severity.Error);
 
-        if (!result.Succeeded)
+        var payload = result.Payload;
+        if (!payload.Succeeded)
         {
-            foreach (var message in result.Messages)
+            foreach (var message in payload.Messages)
             {
                 SnackBar.Add(message, Severity.Error);
             }
@@ -163,7 +170,7 @@
         };
         var parameters = new DialogParameters {
             {
-                nameof(ConfigDetailsResponse), result.Data
+                nameof(ConfigDetailsResponse), payload.Data
             }
         };
 
@@ -173,10 +180,13 @@
     private async Task InvokeDeleteDialog(string name)
     {
         var result = await FlowSynxClient.ConfigDetails(new ConfigDetailsRequest { Name = name }, _cts.Token);
+        if (result.StatusCode != 200)
+            SnackBar.Add("It seems there is an error occurred during processing the request.", Severity.Error);
 
-        if (!result.Succeeded)
+        var payload = result.Payload;
+        if (!payload.Succeeded)
         {
-            foreach (var message in result.Messages)
+            foreach (var message in payload.Messages)
             {
                 SnackBar.Add(message, Severity.Error);
             }
@@ -193,7 +203,7 @@
         };
         var parameters = new DialogParameters {
             {
-                nameof(ConfigDetailsResponse), result.Data
+                nameof(ConfigDetailsResponse), payload.Data
             }
         };
 
