@@ -1,4 +1,4 @@
-﻿using FlowSynx.Logging;
+﻿using FlowSynx.Logging.Extensions;
 
 namespace Dashboard.Extensions;
 
