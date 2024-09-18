@@ -111,38 +111,14 @@ public static class Theme
 
     public static MudTheme DefaultTheme = new()
     {
-        Palette = new PaletteLight()
-        {
-            Primary = "#0aa3ec",
-            AppbarBackground = "#0aa3ec",
-            Background = Colors.Grey.Lighten5,
-            DrawerBackground = "#FFFFFF",
-            DrawerText = "rgba(0,0,0, 0.7)"
-        },
+        Palette = new PaletteLight() { },
         Typography = DefaultTypography,
         LayoutProperties = DefaultLayoutProperties
     };
 
     public static MudTheme DarkTheme = new()
     {
-        Palette = new PaletteDark()
-        {
-            Primary = "#0aa3ec",
-            Black = "#27272f",
-            Background = "#32333d",
-            BackgroundGrey = "#27272f",
-            Surface = "#373740",
-            DrawerBackground = "#27272f",
-            DrawerText = "rgba(255,255,255, 0.50)",
-            AppbarBackground = "#373740",
-            AppbarText = "rgba(255,255,255, 0.70)",
-            TextPrimary = "rgba(255,255,255, 0.70)",
-            TextSecondary = "rgba(255,255,255, 0.50)",
-            ActionDefault = "#adadb1",
-            ActionDisabled = "rgba(255,255,255, 0.26)",
-            ActionDisabledBackground = "rgba(255,255,255, 0.12)",
-            DrawerIcon = "rgba(255,255,255, 0.50)"
-        },
+        Palette = new PaletteDark() { },
         Typography = DefaultTypography,
         LayoutProperties = DefaultLayoutProperties
     };
