@@ -3,9 +3,12 @@
 @using FlowSynx.Client.Requests.Plugins
 @using FlowSynx.Client.Responses.Plugins
 @using Microsoft.AspNetCore.Components
+@using FlowSynx.IO.Serialization
 
 @inject IFlowSynxClient FlowSynxClient
 @inject ISnackbar SnackBar
+@inject IDeserializer Deserializer
+@inject ISerializer Serializer
 
 <PageTitle>FlowSynx Plugins</PageTitle>
 
@@ -14,23 +17,12 @@
 <MudExpansionPanels>
     <MudExpansionPanel Text="Query">
         <MudGrid>
-            <MudItem xs="12" md="4">
-                <MudTextField @bind-Value="Request.Include" Label="Include" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Include plugins matching pattern"></MudTextField>
-            </MudItem>
-            <MudItem xs="12" md="4">
-                <MudTextField @bind-Value="Request.Exclude" Label="Exclude" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Exclude plugins matching pattern"></MudTextField>
+            <MudItem xs="12" md="8">
+                <MudTextField @bind-Value="Request.Filter" Label="Filter" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Desplay desired fields related to the result objects"></MudTextField>
             </MudItem>
             <MudItem xs="12" md="4">
                 <MudCheckBox @bind-Value="Request.CaseSensitive" Label="Ignore/Apply case sensitive in filters"></MudCheckBox>
             </MudItem>
-            <MudFlexBreak />
-            <MudItem xs="12" md="4">
-                <MudTextField @bind-Value="Request.Sorting" Label="Sorting" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Sorting plugins based on field name and ascending and descending. Like Property ASC, Property2 DESC"></MudTextField>
-            </MudItem>
-            <MudItem xs="12" md="4">
-                <MudTextField @bind-Value="Request.MaxResults" Label="Maximum results" Variant="Variant.Text" Margin="Margin.Dense" HelperText="The maximum number of results to return"></MudTextField>
-            </MudItem>
-            <MudFlexBreak />
             <MudItem xs="12" md="12">
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" Color="Color.Primary" Size="Size.Small" OnClick="OnSearch">Process</MudButton>
             </MudItem>
@@ -62,12 +54,12 @@
 
 @code {
     private readonly CancellationTokenSource _cts = new();
-    private PluginsListRequest? Request { get; set; } = new PluginsListRequest();
-    private MudTable<PluginsListResponse>? _table;
+    private PluginsListRequest Request { get; set; } = new PluginsListRequest();
+    private MudTable<PluginItemModel>? _table;
 
-    private async Task<TableData<PluginsListResponse>> LoadData(TableState state)
+    private async Task<TableData<PluginItemModel>> LoadData(TableState state)
     {
-        IEnumerable<PluginsListResponse> response = new List<PluginsListResponse>();
+        IEnumerable<object> response = new List<object>();
         if (Request != null)
         {
             var result = await FlowSynxClient.PluginsList(Request, _cts.Token);
@@ -88,10 +80,13 @@
             }
         }
 
+        var jsonSerializeObject = Serializer.Serialize(response);
+        var data = Deserializer.Deserialize<List<PluginItemModel>>(jsonSerializeObject);
+
         var configListResponses = response.ToList();
-        return new TableData<PluginsListResponse>
+        return new TableData<PluginItemModel>
             {
-                Items = configListResponses,
+                Items = data,
                 TotalItems = configListResponses.Count()
             };
     }

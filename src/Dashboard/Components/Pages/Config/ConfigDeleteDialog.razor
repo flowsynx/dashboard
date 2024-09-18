@@ -36,7 +36,7 @@
 
     private async Task Delete()
     {
-        var result = await FlowSynxClient.DeleteConfig(new DeleteConfigRequest{ Include = ConfigDetailsResponse.Name });
+        var result = await FlowSynxClient.DeleteConfig(new DeleteConfigRequest { Filter = $"id = '{ConfigDetailsResponse.Id}'" });
         if (result.StatusCode != 200)
             SnackBar.Add("It seems there is an error occurred during processing the request.", Severity.Error);
 

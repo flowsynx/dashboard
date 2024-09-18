@@ -1,10 +1,14 @@
-﻿@using FlowSynx.Client
+﻿@using Dashboard.Components.Pages.Plugins
+@using FlowSynx.Client
 @using FlowSynx.Client.Requests.Config
 @using FlowSynx.Client.Requests.Plugins
 @using FlowSynx.Client.Responses.Plugins
+@using FlowSynx.IO.Serialization
 
 @inject IFlowSynxClient FlowSynxClient
 @inject ISnackbar SnackBar
+@inject IDeserializer DialogService
+@inject ISerializer Serializer
 
 <MudDialog>
     <TitleContent>
@@ -65,7 +69,7 @@
 
     private List<TempKeyValue> _specifications = new List<TempKeyValue>();
 
-    private IEnumerable<PluginsListResponse> _pluginTypes = new List<PluginsListResponse>();
+    private IEnumerable<PluginItemModel> _pluginTypes = new List<PluginItemModel>();
 
     void Close() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
@@ -103,7 +107,10 @@
             Cancel();
         }
 
-        _pluginTypes = payload.Data;
+        var jsonSerializeObject = Serializer.Serialize(payload.Data);
+        var data = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PluginItemModel>>(jsonSerializeObject);
+
+        _pluginTypes = data ?? new List<PluginItemModel>();
     }
 
     private async Task<IEnumerable<string>> SearchPluginTypes(string value)
