@@ -4,6 +4,7 @@ using Dashboard.Extensions;
 using Dashboard.Preferences;
 using FlowSynx.Client;
 using FlowSynx.Environment;
+using FlowSynx.IO;
 using MudBlazor.Services;
 
 namespace Dashboard;
@@ -33,6 +34,7 @@ public static class Program
                 .AddMudServices()
                 .AddBlazoredLocalStorage()
                 .AddLoggingService()
+                .AddSerialization()
                 .AddScoped<IPreferenceManager, PreferenceManager>()
                 .AddScoped<IFlowSynxClient, FlowSynxClient>()
                 .AddSingleton(new FlowSynxClientConnection { BaseAddress = cliArguments.Address });
