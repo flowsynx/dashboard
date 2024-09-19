@@ -104,6 +104,7 @@ jobs:
       with:
         name: dashboard_flowsynx
         path: ${{ env.ARTIFACT_DIR }}
+        merge-multiple: true
     - name: generate checksum files
       run: cd ${ARTIFACT_DIR} && for i in *; do sha256sum -b $i > "$i.sha256"; done && cd -
     - name: Create Release
