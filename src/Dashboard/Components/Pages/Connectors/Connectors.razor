@@ -1,7 +1,7 @@
-﻿@page "/plugins"
+﻿@page "/connectors"
 @using FlowSynx.Client
-@using FlowSynx.Client.Requests.Plugins
-@using FlowSynx.Client.Responses.Plugins
+@using FlowSynx.Client.Requests.Connectors
+@using FlowSynx.Client.Responses.Connectors
 @using Microsoft.AspNetCore.Components
 @using FlowSynx.IO.Serialization
 
@@ -10,9 +10,9 @@
 @inject IDeserializer Deserializer
 @inject ISerializer Serializer
 
-<PageTitle>FlowSynx Plugins</PageTitle>
+<PageTitle>FlowSynx Connectors</PageTitle>
 
-<HeaderTitle Title="Plugins list" Description="List of plugins supported by FlowSynx system" />
+<HeaderTitle Title="Connectors list" Description="List of connectors supported by FlowSynx system" />
 
 <MudExpansionPanels>
     <MudExpansionPanel Text="Query">
@@ -54,15 +54,15 @@
 
 @code {
     private readonly CancellationTokenSource _cts = new();
-    private PluginsListRequest Request { get; set; } = new PluginsListRequest();
-    private MudTable<PluginItemModel>? _table;
+    private ConnectorsListRequest Request { get; set; } = new ConnectorsListRequest();
+    private MudTable<ConnectorItemModel>? _table;
 
-    private async Task<TableData<PluginItemModel>> LoadData(TableState state)
+    private async Task<TableData<ConnectorItemModel>> LoadData(TableState state)
     {
         IEnumerable<object> response = new List<object>();
         if (Request != null)
         {
-            var result = await FlowSynxClient.PluginsList(Request, _cts.Token);
+            var result = await FlowSynxClient.ConnectorsList(Request, _cts.Token);
             if (result.StatusCode != 200)
                 SnackBar.Add("It seems there is an error occurred during processing the request.", Severity.Error);
 
@@ -81,10 +81,10 @@
         }
 
         var jsonSerializeObject = Serializer.Serialize(response);
-        var data = Deserializer.Deserialize<List<PluginItemModel>>(jsonSerializeObject);
+        var data = Deserializer.Deserialize<List<ConnectorItemModel>>(jsonSerializeObject);
 
         var configListResponses = response.ToList();
-        return new TableData<PluginItemModel>
+        return new TableData<ConnectorItemModel>
             {
                 Items = data,
                 TotalItems = configListResponses.Count()

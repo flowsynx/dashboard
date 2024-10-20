@@ -1,8 +1,8 @@
-﻿@using Dashboard.Components.Pages.Plugins
+﻿@using Dashboard.Components.Pages.Connectors
 @using FlowSynx.Client
 @using FlowSynx.Client.Requests.Config
-@using FlowSynx.Client.Requests.Plugins
-@using FlowSynx.Client.Responses.Plugins
+@using FlowSynx.Client.Requests.Connectors
+@using FlowSynx.Client.Responses.Connectors
 @using FlowSynx.IO.Serialization
 
 @inject IFlowSynxClient FlowSynxClient
@@ -22,7 +22,7 @@
                 <MudTextField For="@(() => AddConfigRequest.Name)" @bind-Value="AddConfigRequest.Name" Label="Name" Variant="Variant.Text" Margin="Margin.Dense" HelperText="Enter the name of config item" />
             </MudItem>
             <MudItem xs="12" md="12">
-                <MudAutocomplete T="string" Label="Plugin Type" For="@(() => AddConfigRequest.Type)" @bind-Value="AddConfigRequest.Type" ResetValueOnEmptyText="true" SearchFunc="@SearchPluginTypes" Variant="Variant.Text" Margin="Margin.Dense" ToStringFunc="@(i => _pluginTypes.FirstOrDefault(b => b.Type == i)?.Type ?? string.Empty)" HelperText="Enter the type of config item" />
+                <MudAutocomplete T="string" Label="Connector Type" For="@(() => AddConfigRequest.Type)" @bind-Value="AddConfigRequest.Type" ResetValueOnEmptyText="true" SearchFunc="@SearchConnectorTypes" Variant="Variant.Text" Margin="Margin.Dense" ToStringFunc="@(i => _connectorTypes.FirstOrDefault(b => b.Type == i)?.Type ?? string.Empty)" HelperText="Enter the type of config item" />
             </MudItem>
 
             <MudItem xs="12" md="12">
@@ -69,7 +69,7 @@
 
     private List<TempKeyValue> _specifications = new List<TempKeyValue>();
 
-    private IEnumerable<PluginItemModel> _pluginTypes = new List<PluginItemModel>();
+    private IEnumerable<ConnectorItemModel> _connectorTypes = new List<ConnectorItemModel>();
 
     void Close() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
@@ -88,12 +88,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadPluginTypes();
+        await LoadConnectorTypes();
     }
 
-    private async Task LoadPluginTypes()
+    private async Task LoadConnectorTypes()
     {
-        var result = await FlowSynxClient.PluginsList(new PluginsListRequest());
+        var result = await FlowSynxClient.ConnectorsList(new ConnectorsListRequest());
         if (result.StatusCode != 200)
             SnackBar.Add("It seems there is an error occurred during processing the request.", Severity.Error);
 
@@ -108,18 +108,18 @@
         }
 
         var jsonSerializeObject = Serializer.Serialize(payload.Data);
-        var data = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PluginItemModel>>(jsonSerializeObject);
+        var data = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ConnectorItemModel>>(jsonSerializeObject);
 
-        _pluginTypes = data ?? new List<PluginItemModel>();
+        _connectorTypes = data ?? new List<ConnectorItemModel>();
     }
 
-    private async Task<IEnumerable<string>> SearchPluginTypes(string value)
+    private async Task<IEnumerable<string>> SearchConnectorTypes(string value)
     {
         await Task.Delay(5);
         if (string.IsNullOrEmpty(value))
-            return _pluginTypes.Select(x => x.Type);
+            return _connectorTypes.Select(x => x.Type);
 
-        return _pluginTypes.Where(x => x.Description != null && x.Description.Contains(value, StringComparison.InvariantCultureIgnoreCase))
+        return _connectorTypes.Where(x => x.Description != null && x.Description.Contains(value, StringComparison.InvariantCultureIgnoreCase))
             .Select(x => x.Type);
     }
 

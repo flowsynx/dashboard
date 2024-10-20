@@ -1,6 +1,6 @@
-﻿namespace Dashboard.Components.Pages.Plugins;
+﻿namespace Dashboard.Components.Pages.Connectors;
 
-public class PluginItemModel
+public class ConnectorItemModel
 {
     public Guid? Id { get; set; }
     public string? Name { get; set; }
